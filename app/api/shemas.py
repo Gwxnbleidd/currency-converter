@@ -5,7 +5,7 @@ from datetime import datetime
 
 class UsersShemas(BaseModel):
     username: str 
-    password: bytes | str
+    password: str
     email: EmailStr 
     active: bool = True
 

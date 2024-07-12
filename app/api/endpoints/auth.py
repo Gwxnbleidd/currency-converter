@@ -37,7 +37,7 @@ def get_user_from_token(request: Request, response: Response):
 
 @auth_rout.post('/register')
 def register_user(creditials: Annotated[UsersShemas, Depends()]):
-    creditials.password = hash_password(bytes(creditials.password))
+    creditials.password = hash_password(bytes(creditials.password, encoding='utf-8'))
     add_user(creditials)
     return {f'Welcome, {creditials.username}'}
 
