@@ -21,10 +21,13 @@ def get_user_from_token(request: Request, response: Response):
     try:
         token = request.cookies.get(COOKIE_KEY)
         payload = decode_jwt_token(token)
-        user = payload.get('sub')
-        if user:
-            return user
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token_1')
+        username = payload.get('sub')
+        if username:
+            if payload.get('active'):
+                return username
+            else:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='The user is blocked')        
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token')
     except InvalidTokenError:
         request.cookies.pop(COOKIE_KEY)
         response.delete_cookie(COOKIE_KEY)
@@ -43,7 +46,7 @@ def login_user(response: Response, creditials: Annotated[OAuth2PasswordRequestFo
     user = get_user_from_db(creditials.username)
     creditials.password = bytes(creditials.password, encoding='utf-8')
     if bcrypt.checkpw(creditials.password, user.password):
-        token = create_jwt_token({'sub': user.username, 'email': user.email})
+        token = create_jwt_token({'sub': user.username, 'email': user.email, 'active': user.active})
         response.set_cookie(COOKIE_KEY, token)
         return {'message': 'Successfull!'}
     else:
