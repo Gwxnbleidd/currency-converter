@@ -1,11 +1,11 @@
 from typing import Annotated
 from fastapi import (APIRouter, Response, Request, 
-                     HTTPException, status, Depends, Cookie)
+                     HTTPException, status, Depends)
 from fastapi.security import OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
 import bcrypt
 
-from app.api.shemas import UsersShemas
+from app.api.shemas import UsersShemas, RegisterForm
 from app.core.security import create_jwt_token, decode_jwt_token
 from app.database.orm import add_user, get_user_from_db
 
@@ -36,7 +36,7 @@ def get_user_from_token(request: Request, response: Response):
 
 
 @auth_rout.post('/register')
-def register_user(creditials: Annotated[UsersShemas, Depends()]):
+def register_user(creditials: Annotated[RegisterForm, Depends()]):
     creditials.password = hash_password(bytes(creditials.password, encoding='utf-8'))
     add_user(creditials)
     return {f'Welcome, {creditials.username}'}

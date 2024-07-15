@@ -5,6 +5,12 @@ from datetime import datetime
 
 class UsersShemas(BaseModel):
     username: str 
+    password: bytes
+    email: EmailStr 
+    active: bool = True
+
+class RegisterForm(BaseModel):
+    username: str 
     password: str
     email: EmailStr 
     active: bool = True
